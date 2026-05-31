@@ -1,37 +1,46 @@
+"use client";
+
+import { useState } from "react";
+
 export default function WardrobePage() {
+  const [image, setImage] = useState<string | null>(null);
+
+  const handleImageChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setImage(imageUrl);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-[#0B0B0F] text-white p-10">
       <h1 className="text-5xl font-bold">My Wardrobe</h1>
 
       <p className="text-gray-400 mt-3">
-        Manage your clothing collection.
+        Upload clothing items to your wardrobe.
       </p>
 
-      <div className="grid md:grid-cols-4 gap-6 mt-10">
-        <div className="bg-[#13131A] p-8 rounded-3xl">
-          <h2 className="text-xl font-semibold">👕 Shirts</h2>
-          <p className="text-gray-400 mt-2">0 Items</p>
-        </div>
-
-        <div className="bg-[#13131A] p-8 rounded-3xl">
-          <h2 className="text-xl font-semibold">👖 Pants</h2>
-          <p className="text-gray-400 mt-2">0 Items</p>
-        </div>
-
-        <div className="bg-[#13131A] p-8 rounded-3xl">
-          <h2 className="text-xl font-semibold">👟 Shoes</h2>
-          <p className="text-gray-400 mt-2">0 Items</p>
-        </div>
-
-        <div className="bg-[#13131A] p-8 rounded-3xl">
-          <h2 className="text-xl font-semibold">🧥 Jackets</h2>
-          <p className="text-gray-400 mt-2">0 Items</p>
-        </div>
+      <div className="mt-10">
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+        />
       </div>
 
-      <button className="mt-10 bg-purple-600 px-6 py-3 rounded-xl">
-        Upload Clothing
-      </button>
+      {image && (
+        <div className="mt-10">
+          <img
+            src={image}
+            alt="Uploaded clothing"
+            className="w-64 rounded-3xl"
+          />
+        </div>
+      )}
     </main>
   );
 }
