@@ -3,17 +3,20 @@
 import { useState } from "react";
 
 export default function WardrobePage() {
-  const [image, setImage] = useState<string | null>(null);
+  const [images, setImages] = useState<string[]>([]);
 
   const handleImageChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const file = event.target.files?.[0];
+    const files = event.target.files;
 
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setImage(imageUrl);
-    }
+    if (!files) return;
+
+    const newImages = Array.from(files).map((file) =>
+      URL.createObjectURL(file)
+    );
+
+    setImages((prev) => [...prev, ...newImages]);
   };
 
   return (
@@ -21,26 +24,36 @@ export default function WardrobePage() {
       <h1 className="text-5xl font-bold">My Wardrobe</h1>
 
       <p className="text-gray-400 mt-3">
-        Upload clothing items to your wardrobe.
+        Upload and manage your clothing collection.
       </p>
 
-      <div className="mt-10">
+      <div className="mt-8">
         <input
           type="file"
+          multiple
           accept="image/*"
           onChange={handleImageChange}
         />
       </div>
 
-      {image && (
-        <div className="mt-10">
-          <img
-            src={image}
-            alt="Uploaded clothing"
-            className="w-64 rounded-3xl"
-          />
-        </div>
-      )}
+      <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6 mt-10">
+        {images.map((image, index) => (
+          <div
+            key={index}
+            className="bg-[#13131A] p-4 rounded-3xl"
+          >
+            <img
+              src={image}
+              alt={`Clothing ${index}`}
+              className="rounded-2xl w-full h-64 object-cover"
+            />
+
+            <p className="mt-3 text-gray-300">
+              Clothing Item {index + 1}
+            </p>
+          </div>
+        ))}
+      </div>
     </main>
   );
 }
