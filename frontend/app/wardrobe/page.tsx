@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 export default function WardrobePage() {
   const [images, setImages] = useState<string[]>([]);
@@ -26,6 +27,20 @@ export default function WardrobePage() {
       <p className="text-gray-400 mt-3">
         Upload and manage your clothing collection.
       </p>
+      <button
+        className="bg-purple-600 px-4 py-2 rounded-xl mt-4"
+        onClick={async () => {
+            const { data, error } = await supabase
+            .storage
+            .from("clothes")
+            .list();
+
+            console.log("DATA:", data);
+            console.log("ERROR:", error);
+        }}
+        >
+        Test Supabase
+        </button>
 
       <div className="mt-8">
         <input

@@ -1,4 +1,6 @@
+import { supabase } from "@/lib/supabase";
 export default function DashboardPage() {
+  console.log(supabase);
   return (
     <main className="min-h-screen bg-[#0B0B0F] text-white p-10">
       <h1 className="text-5xl font-bold">Dashboard</h1>
