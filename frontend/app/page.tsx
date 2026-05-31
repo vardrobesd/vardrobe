@@ -1,13 +1,23 @@
+import Link from "next/link";
 export default function Home() {
   return (
     <main className="min-h-screen bg-[#0B0B0F] text-white">
       <nav className="flex items-center justify-between px-8 py-6">
         <h1 className="text-2xl font-bold">V.</h1>
 
-        <div className="flex gap-6">
+        <div className="flex gap-6 items-center">
           <button>Features</button>
           <button>About</button>
-          <button>Login</button>
+
+          <Link href="/login">
+            <button>Login</button>
+          </Link>
+
+          <Link href="/signup">
+            <button className="bg-purple-600 px-4 py-2 rounded-xl">
+              Get Started
+            </button>
+          </Link>
         </div>
       </nav>
 
