@@ -1,7 +1,152 @@
-export default function Profile() {
+"use client";
+
+import { useState } from "react";
+import { supabase } from "@/lib/supabase";
+
+export default function ProfilePage() {
+
+  const [bodyImage, setBodyImage] =
+    useState<string | null>(null);
+
+  const [faceImage, setFaceImage] =
+    useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
+
+  const uploadBodyPhoto = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    const fileName =
+      `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "-")}`;
+
+    const { error } = await supabase.storage
+      .from("user-models")
+      .upload(fileName, file);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    const { data } = supabase.storage
+      .from("user-models")
+      .getPublicUrl(fileName);
+
+    setBodyImage(data.publicUrl);
+  };
+  const uploadFacePhoto = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    const fileName =
+      `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "-")}`;
+
+    const { error } = await supabase.storage
+      .from("user-models")
+      .upload(fileName, file);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    const { data } = supabase.storage
+      .from("user-models")
+      .getPublicUrl(fileName);
+
+    setFaceImage(data.publicUrl);
+  };
+  const saveModel = async () => {
+    if (!bodyImage || !faceImage) {
+      alert("Upload both images first");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("user_models")
+      .insert({
+        body_photo_url: bodyImage,
+        face_photo_url: faceImage,
+      });
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    setSaved(true);
+  };
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center">
-      <h1 className="text-5xl font-bold">Profile</h1>
-    </div>
+    <main className="min-h-screen bg-[#0B0B0F] text-white p-10">
+      <h1 className="text-5xl font-bold">
+        My Model
+      </h1>
+
+      <p className="text-gray-400 mt-3">
+        Upload your body and face photos.
+      </p>
+
+      <div className="grid md:grid-cols-2 gap-8 mt-10">
+        <div className="bg-[#13131A] p-6 rounded-3xl">
+          <h2 className="text-xl font-semibold">
+            Body Photo
+          </h2>
+
+          <input
+            type="file"
+            className="mt-4"
+            accept="image/*"
+            onChange={uploadBodyPhoto}
+          />
+          {bodyImage && (
+            <img
+              src={bodyImage}
+              alt="Body"
+              className="mt-4 rounded-2xl w-full"
+            />
+          )}
+        </div>
+
+        <div className="bg-[#13131A] p-6 rounded-3xl">
+          <h2 className="text-xl font-semibold">
+            Face Photo
+          </h2>
+
+          <input
+            type="file"
+            className="mt-4"
+            accept="image/*"
+            onChange={uploadFacePhoto}
+          />
+          {faceImage && (
+            <img
+              src={faceImage}
+              alt="Face"
+              className="mt-4 rounded-2xl w-full"
+            />
+          )}
+        </div>
+      </div>
+      <div className="mt-8">
+        <button
+          onClick={saveModel}
+          className="bg-purple-600 px-6 py-3 rounded-xl"
+        >
+          Save Model
+        </button>
+
+        {saved && (
+          <p className="text-green-400 mt-3">
+            Model saved successfully
+          </p>
+        )}
+      </div>
+    </main>
   );
 }

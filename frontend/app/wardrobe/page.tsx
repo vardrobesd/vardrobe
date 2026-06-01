@@ -1,11 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 export default function WardrobePage() {
   const [images, setImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  useEffect(() => {
+    loadClothes();
+  }, []);
+
+  const loadClothes = async () => {
+    const { data, error } = await supabase
+      .from("clothes")
+      .select("*");
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    const urls = data.map(
+      (item) => item.image_url
+    );
+
+    setImages(urls);
+  };
 
   const handleImageChange = async (
     event: React.ChangeEvent<HTMLInputElement>
