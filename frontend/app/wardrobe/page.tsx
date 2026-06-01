@@ -36,6 +36,17 @@ export default function WardrobePage() {
         .getPublicUrl(fileName);
 
       uploadedUrls.push(data.publicUrl);
+      const { error: dbError } = await supabase
+        .from("clothes")
+        .insert({
+          name: file.name,
+          image_url: data.publicUrl,
+        });
+
+      if (dbError) {
+        alert(dbError.message);
+        console.error(dbError);
+      }
     }
 
     setImages((prev) => [...prev, ...uploadedUrls]);
