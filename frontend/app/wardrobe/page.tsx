@@ -6,14 +6,29 @@ import { supabase } from "@/lib/supabase";
 export default function WardrobePage() {
   const [images, setImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [userId, setUserId] =
+    useState<string>("");
   useEffect(() => {
-    loadClothes();
+    getUser();
   }, []);
+  const getUser = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  const loadClothes = async () => {
+    if (!user) return;
+
+    setUserId(user.id);
+
+    loadClothes(user.id);
+  };
+  const loadClothes = async (
+    currentUserId: string
+  ) => {
     const { data, error } = await supabase
       .from("clothes")
-      .select("*");
+      .select("*")
+      .eq("user_id", currentUserId);
 
     if (error) {
       console.error(error);
@@ -59,6 +74,7 @@ export default function WardrobePage() {
       const { error: dbError } = await supabase
         .from("clothes")
         .insert({
+          user_id: userId,
           name: file.name,
           image_url: data.publicUrl,
         });
