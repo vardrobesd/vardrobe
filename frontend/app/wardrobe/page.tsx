@@ -5,19 +5,42 @@ import { supabase } from "@/lib/supabase";
 
 export default function WardrobePage() {
   const [images, setImages] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
 
-  const handleImageChange = (
+  const handleImageChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const files = event.target.files;
 
     if (!files) return;
 
-    const newImages = Array.from(files).map((file) =>
-      URL.createObjectURL(file)
-    );
+    setUploading(true);
 
-    setImages((prev) => [...prev, ...newImages]);
+    const uploadedUrls: string[] = [];
+
+    for (const file of Array.from(files)) {
+      const fileName =
+        `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "-")}`;
+
+      const { error } = await supabase.storage
+        .from("clothes")
+        .upload(fileName, file);
+
+      if (error) {
+        console.error(error);
+        continue;
+      }
+
+      const { data } = supabase.storage
+        .from("clothes")
+        .getPublicUrl(fileName);
+
+      uploadedUrls.push(data.publicUrl);
+    }
+
+    setImages((prev) => [...prev, ...uploadedUrls]);
+
+    setUploading(false);
   };
 
   return (
@@ -49,6 +72,11 @@ export default function WardrobePage() {
           accept="image/*"
           onChange={handleImageChange}
         />
+        {uploading && (
+          <p className="mt-3 text-purple-400">
+            Uploading...
+          </p>
+        )}
       </div>
 
       <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6 mt-10">
