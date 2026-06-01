@@ -1,16 +1,32 @@
 "use client";
 
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import Navbar from "@/components/Navbar";
+
 export default function DashboardPage() {
   const [userId, setUserId] =
     useState<string>("");
+  const [clothesCount, setClothesCount] =
+    useState(0);
 
   
   useEffect(() => {
     getUser();
   }, []);
+  
 
+  const loadStats = async (
+    currentUserId: string
+  ) => {
+    const { data } = await supabase
+      .from("clothes")
+      .select("*")
+      .eq("user_id", currentUserId);
+
+    setClothesCount(data?.length || 0);
+  };
   const getUser = async () => {
     const {
       data: { user },
@@ -18,11 +34,15 @@ export default function DashboardPage() {
 
     if (user) {
       setUserId(user.id);
+      loadStats(user.id);
     }
   };
+  
   return (
     <main className="min-h-screen bg-[#0B0B0F] text-white p-10">
+      <Navbar />
       <h1 className="text-5xl font-bold">Dashboard</h1>
+      
 
       <p className="text-gray-400 mt-3">
         Welcome back to Vardrobe.
@@ -32,17 +52,31 @@ export default function DashboardPage() {
       </p>
 
       <div className="grid grid-cols-3 gap-6 mt-10">
-        <div className="bg-[#13131A] rounded-3xl p-6">
-          <h2 className="text-3xl font-bold">0</h2>
+        <div className="bg-[#13131A] rounded-3xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer border border-transparent hover:border-purple-500">
+          <div className="text-4xl mb-3">
+            👕
+          </div>
+
+          <h2 className="text-3xl font-bold">
+            {clothesCount}
+          </h2>
           <p className="text-gray-400">Clothes Uploaded</p>
         </div>
 
-        <div className="bg-[#13131A] rounded-3xl p-6">
+        <div className="bg-[#13131A] rounded-3xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer border border-transparent hover:border-purple-500">
+          <div className="text-4xl mb-3">
+            ✨
+          </div>
+
           <h2 className="text-3xl font-bold">0</h2>
           <p className="text-gray-400">Try-Ons Generated</p>
         </div>
 
-        <div className="bg-[#13131A] rounded-3xl p-6">
+        <div className="bg-[#13131A] rounded-3xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer border border-transparent hover:border-purple-500">
+          <div className="text-4xl mb-3">
+            🧍
+          </div>
+
           <h2 className="text-3xl font-bold">1</h2>
           <p className="text-gray-400">Body Photos</p>
         </div>

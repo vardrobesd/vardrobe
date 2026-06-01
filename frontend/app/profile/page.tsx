@@ -1,6 +1,6 @@
 "use client";
-
-import { useState } from "react";
+import Navbar from "@/components/Navbar";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 export default function ProfilePage() {
@@ -11,6 +11,40 @@ export default function ProfilePage() {
   const [faceImage, setFaceImage] =
     useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [userId, setUserId] =
+    useState<string>("");
+  useEffect(() => {
+    getUser();
+  }, []);
+  const loadModel = async (
+    currentUserId: string
+  ) => {
+    const { data, error } = await supabase
+      .from("user_models")
+      .select("*")
+      .eq("user_id", currentUserId)
+      .order("created_at", {
+        ascending: false,
+      })
+      .limit(1)
+      .single();
+
+    if (error || !data) return;
+
+    setBodyImage(data.body_photo_url);
+    setFaceImage(data.face_photo_url);
+  };
+  const getUser = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      setUserId(user.id);
+      loadModel(user.id);
+    }
+    
+  };
 
   const uploadBodyPhoto = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -71,6 +105,7 @@ export default function ProfilePage() {
     const { error } = await supabase
       .from("user_models")
       .insert({
+        user_id: userId,
         body_photo_url: bodyImage,
         face_photo_url: faceImage,
       });
@@ -84,6 +119,7 @@ export default function ProfilePage() {
   };
   return (
     <main className="min-h-screen bg-[#0B0B0F] text-white p-10">
+      <Navbar />
       <h1 className="text-5xl font-bold">
         My Model
       </h1>
@@ -93,8 +129,8 @@ export default function ProfilePage() {
       </p>
 
       <div className="grid md:grid-cols-2 gap-8 mt-10">
-        <div className="bg-[#13131A] p-6 rounded-3xl">
-          <h2 className="text-xl font-semibold">
+        <div className="bg-[#13131A] p-6 rounded-3xl border border-transparent hover:border-purple-500 transition-all">
+          <h2 className="text-2xl font-bold">
             Body Photo
           </h2>
 
@@ -108,13 +144,13 @@ export default function ProfilePage() {
             <img
               src={bodyImage}
               alt="Body"
-              className="mt-4 rounded-2xl w-full"
+              className="mt-4 rounded-2xl w-full h-[400px] object-cover shadow-xl"
             />
           )}
         </div>
 
-        <div className="bg-[#13131A] p-6 rounded-3xl">
-          <h2 className="text-xl font-semibold">
+        <div className="bg-[#13131A] p-6 rounded-3xl border border-transparent hover:border-purple-500 transition-all">
+          <h2 className="text-2xl font-bold">
             Face Photo
           </h2>
 
@@ -128,25 +164,25 @@ export default function ProfilePage() {
             <img
               src={faceImage}
               alt="Face"
-              className="mt-4 rounded-2xl w-full"
+              className="mt-4 rounded-2xl w-full h-[400px] object-cover shadow-xl"
             />
           )}
         </div>
       </div>
       <div className="mt-8">
-        <button
-          onClick={saveModel}
-          className="bg-purple-600 px-6 py-3 rounded-xl"
-        >
-          Save Model
-        </button>
+      <button
+        onClick={saveModel}
+        className="bg-purple-600 hover:bg-purple-700 px-8 py-4 rounded-xl transition-all text-lg font-semibold"
+      >
+        Save Model
+      </button>
 
-        {saved && (
-          <p className="text-green-400 mt-3">
-            Model saved successfully
-          </p>
-        )}
-      </div>
+      {saved && (
+        <p className="text-green-400 mt-4 text-lg font-medium">
+          Model saved successfully
+        </p>
+      )}
+    </div>
     </main>
   );
 }

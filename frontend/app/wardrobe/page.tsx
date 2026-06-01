@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import Navbar from "@/components/Navbar";
 
 export default function WardrobePage() {
-  const [images, setImages] = useState<string[]>([]);
+  const [clothes, setClothes] =
+    useState<any[]>([]);
   const [uploading, setUploading] = useState(false);
   const [userId, setUserId] =
     useState<string>("");
@@ -35,11 +37,27 @@ export default function WardrobePage() {
       return;
     }
 
-    const urls = data.map(
-      (item) => item.image_url
-    );
+    setClothes(data || []);
+  };
+  const deleteClothing = async (
+    clothingId: string
+  ) => {
+    console.log("DELETE CLICKED", clothingId);
 
-    setImages(urls);
+    const { error } = await supabase
+      .from("clothes")
+      .delete()
+      .eq("id", clothingId);
+
+    if (error) {
+      alert(error.message);
+      console.error(error);
+      return;
+    }
+
+    alert("Deleted");
+
+    loadClothes(userId);
   };
 
   const handleImageChange = async (
@@ -85,32 +103,20 @@ export default function WardrobePage() {
       }
     }
 
-    setImages((prev) => [...prev, ...uploadedUrls]);
+    loadClothes(userId);
 
     setUploading(false);
   };
 
   return (
     <main className="min-h-screen bg-[#0B0B0F] text-white p-10">
+      <Navbar />
       <h1 className="text-5xl font-bold">My Wardrobe</h1>
 
       <p className="text-gray-400 mt-3">
         Upload and manage your clothing collection.
       </p>
-      <button
-        className="bg-purple-600 px-4 py-2 rounded-xl mt-4"
-        onClick={async () => {
-            const { data, error } = await supabase
-            .storage
-            .from("clothes")
-            .list();
-
-            console.log("DATA:", data);
-            console.log("ERROR:", error);
-        }}
-        >
-        Test Supabase
-        </button>
+      
 
       <div className="mt-8">
         <input
@@ -127,20 +133,27 @@ export default function WardrobePage() {
       </div>
 
       <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6 mt-10">
-        {images.map((image, index) => (
+        {clothes.map((item) => (
           <div
-            key={index}
-            className="bg-[#13131A] p-4 rounded-3xl"
+            key={item.id}
+            className="bg-[#13131A] p-4 rounded-3xl border border-transparent hover:border-purple-500 hover:scale-[1.02] transition-all duration-300"
           >
             <img
-              src={image}
-              alt={`Clothing ${index}`}
-              className="rounded-2xl w-full h-64 object-cover"
+              src={item.image_url}
+              alt={item.name}
+              className="rounded-2xl w-full h-64 object-cover shadow-lg"
             />
 
-            <p className="mt-3 text-gray-300">
-              Clothing Item {index + 1}
+            <p className="mt-3 text-white font-medium truncate">
+              {item.name}
             </p>
+
+            <button
+              onClick={() => deleteClothing(item.id)}
+              className="mt-3 w-full bg-red-600 hover:bg-red-700 px-3 py-2 rounded-xl transition-all"
+            >
+              Delete
+            </button>
           </div>
         ))}
       </div>
