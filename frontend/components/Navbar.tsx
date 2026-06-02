@@ -22,7 +22,7 @@ export default function Navbar() {
     <nav className="flex justify-between items-center p-6 border-b border-gray-800 mb-8">
     <a
     href="/dashboard"
-    className="text-3xl font-bold tracking-tight text-purple-500"
+    className="text-3xl font-bold tracking-tight gradient-text"
     >
     Vardrobe
     </a>

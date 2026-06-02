@@ -22,8 +22,8 @@ export default function SignupPage() {
   };
 
   return (
-  <main className="min-h-screen bg-[#0B0B0F] text-white flex items-center justify-center">
-      <div className="w-full max-w-md">
+  <main className="auth-bg min-h-screen bg-[#0B0B0F] text-white flex items-center justify-center px-6">
+      <div className="glass-card w-full max-w-md p-10">
         <h1 className="text-5xl font-bold">
           Sign Up
         </h1>
@@ -31,14 +31,14 @@ export default function SignupPage() {
         <div className="flex flex-col gap-4 mt-8 max-w-md">
           <input
             placeholder="Email"
-            className="bg-[#13131A] p-4 rounded-xl"
+            className="bg-white/5 border border-white/10 p-4 rounded-2xl focus:outline-none focus:border-purple-500 transition-all"
             onChange={(e) => setEmail(e.target.value)}
           />
 
           <input
             type="password"
             placeholder="Password"
-            className="bg-[#13131A] p-4 rounded-xl"
+            className="bg-white/5 border border-white/10 p-4 rounded-2xl focus:outline-none focus:border-purple-500 transition-all"
             onChange={(e) => setPassword(e.target.value)}
           />
 

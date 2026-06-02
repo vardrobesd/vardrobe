@@ -23,13 +23,18 @@ export default function Home() {
         </div>
       </nav>
 
-      <section className="flex flex-col items-center justify-center text-center mt-24 px-6">
-        <h1 className="text-7xl font-extrabold max-w-4xl leading-tight">
+      <section
+        className="relative flex flex-col items-center justify-center text-center mt-24 px-6"
+      >
+        <div className="hero-glow" />
+        <h1 className="text-8xl font-medium tracking-[-0.05em] max-w-5xl leading-none">
           YOUR DIGITAL
           <br />
           WARDROBE.
           <br />
-          POWERED BY AI.
+          <span className="gradient-text">
+            POWERED BY AI.
+          </span>
         </h1>
 
         <p className="text-gray-400 text-xl mt-8 max-w-2xl">
@@ -39,7 +44,7 @@ export default function Home() {
 
         <div className="flex gap-4 mt-10">
           <Link href="/signup">
-            <button className="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-xl transition-all">
+            <button className="gradient-button px-6 py-3 rounded-xl text-white">
               Get Started
             </button>
           </Link>
