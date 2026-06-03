@@ -10,6 +10,38 @@ export default function WardrobePage() {
   const [uploading, setUploading] = useState(false);
   const [userId, setUserId] =
     useState<string>("");
+  const [showModal, setShowModal] =
+    useState(false);
+
+  const [pendingImageUrl, setPendingImageUrl] =
+    useState("");
+
+  const [clothingName, setClothingName] =
+    useState("");
+
+  const [category, setCategory] =
+    useState("Top Wear");
+  const [selectedCategory, setSelectedCategory] =
+    useState("");
+  const topWear =
+    clothes.filter(
+      (item) => item.category === "Top Wear"
+    );
+
+  const bottomWear =
+    clothes.filter(
+      (item) => item.category === "Bottom Wear"
+    );
+
+  const footwear =
+    clothes.filter(
+      (item) => item.category === "Footwear"
+    );
+
+  const accessories =
+    clothes.filter(
+      (item) => item.category === "Accessories"
+    );
   useEffect(() => {
     getUser();
   }, []);
@@ -88,19 +120,12 @@ export default function WardrobePage() {
         .from("clothes")
         .getPublicUrl(fileName);
 
-      uploadedUrls.push(data.publicUrl);
-      const { error: dbError } = await supabase
-        .from("clothes")
-        .insert({
-          user_id: userId,
-          name: file.name,
-          image_url: data.publicUrl,
-        });
+      setPendingImageUrl(data.publicUrl);
 
-      if (dbError) {
-        alert(dbError.message);
-        console.error(dbError);
-      }
+      setClothingName("");
+
+      setShowModal(true);
+      
     }
 
     loadClothes(userId);
@@ -111,29 +136,306 @@ export default function WardrobePage() {
   return (
     <main className="min-h-screen bg-[#0B0B0F] text-white p-10">
       <Navbar />
-      <h1 className="text-5xl font-bold">My Wardrobe</h1>
+      <div className="flex items-start justify-between mt-6">
+        <div>
+          <h1 className="text-5xl font-bold">
+            My Wardrobe
+          </h1>
 
-      <p className="text-gray-400 mt-3">
-        Upload and manage your clothing collection.
-      </p>
-      
+          <p className="text-gray-400 mt-3">
+            Upload and manage your clothing collection.
+          </p>
+        </div>
 
-      <div className="mt-8">
+        <div>
         <input
+          id="clothes-upload"
           type="file"
           multiple
           accept="image/*"
           onChange={handleImageChange}
+          className="hidden"
         />
+
+        <label
+          htmlFor="clothes-upload"
+          className="
+            inline-flex
+            items-center
+            gap-2
+            px-5
+            py-3
+            rounded-full
+            bg-white/5
+            border
+            border-white/10
+            backdrop-blur-xl
+            cursor-pointer
+            hover:border-purple-500
+            hover:bg-white/10
+            transition-all
+          "
+        >
+          <span className="text-lg">+</span>
+          <span>Add Clothing</span>
+        </label>
         {uploading && (
           <p className="mt-3 text-purple-400">
             Uploading...
           </p>
         )}
-      </div>
+          </div>
+        </div>
+      {selectedCategory === "" && (
+        <div className="grid md:grid-cols-2 gap-6 mt-12">
 
-      <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6 mt-10">
-        {clothes.map((item) => (
+          <div
+            onClick={() => setSelectedCategory("Top Wear")}
+            className="
+              bg-white/5
+              backdrop-blur-xl
+              rounded-3xl
+              p-5
+              min-h-[180px]
+              border
+              border-white/10
+              cursor-pointer
+              hover:border-purple-500
+              hover:bg-white/10
+              hover:-translate-y-1
+              transition-all
+              duration-300
+            "
+          >
+            <h2 className="text-2xl font-semibold">
+              Top Wear
+            </h2>
+
+            <p className="text-gray-400 mt-2">
+              {topWear.length} Items
+            </p>
+
+            <div className="flex flex-row items-center mt-6">
+              {topWear.slice(0, 3).map((item, index) => (
+                <img
+                  key={item.id}
+                  src={item.image_url}
+                  alt=""
+                  className="
+                    w-20
+                    h-20
+                    object-cover
+                    rounded-2xl
+                    border
+                    border-white/10
+                    shadow-lg
+                  "
+                  style={{
+                    marginLeft: index === 0 ? 0 : -18,
+                    zIndex: 10 - index,
+                  }}
+                />
+              ))}
+            </div>
+
+            <div className="mt-5 text-purple-400">
+              View Collection →
+            </div>
+          </div>
+
+          <div
+            onClick={() => setSelectedCategory("Bottom Wear")}
+            className="
+              bg-white/5
+              backdrop-blur-xl
+              rounded-3xl
+              p-5
+              min-h-[180px]
+              border
+              border-white/10
+              cursor-pointer
+              hover:border-blue-500
+              hover:bg-white/10
+              hover:-translate-y-1
+              transition-all
+              duration-300
+            "
+          >
+            <h2 className="text-2xl font-semibold">
+              Bottom Wear
+            </h2>
+
+            <p className="text-gray-400 mt-2">
+              {bottomWear.length} Items
+            </p>
+
+            <div className="flex flex-row items-center mt-6">
+              {bottomWear.slice(0, 3).map((item, index) => (
+                <img
+                  key={item.id}
+                  src={item.image_url}
+                  alt=""
+                  className="
+                    w-20
+                    h-20
+                    object-cover
+                    rounded-2xl
+                    border
+                    border-white/10
+                    shadow-lg
+                  "
+                  style={{
+                    marginLeft: index === 0 ? 0 : -18,
+                    zIndex: 10 - index,
+                  }}
+                />
+              ))}
+            </div>
+
+            <div className="mt-5 text-blue-400">
+              View Collection →
+            </div>
+          </div>
+
+          <div
+            onClick={() => setSelectedCategory("Footwear")}
+            className="
+              bg-white/5
+              backdrop-blur-xl
+              rounded-3xl
+              p-5
+              min-h-[180px]
+              border
+              border-white/10
+              cursor-pointer
+              hover:border-green-500
+              hover:bg-white/10
+              hover:-translate-y-1
+              transition-all
+              duration-300
+            "
+          >
+            <h2 className="text-2xl font-semibold">
+              Footwear
+            </h2>
+
+            <p className="text-gray-400 mt-2">
+              {footwear.length} Items
+            </p>
+
+            <div className="flex flex-row items-center mt-6">
+              {footwear.slice(0, 3).map((item, index) => (
+                <img
+                  key={item.id}
+                  src={item.image_url}
+                  alt=""
+                  className="
+                    w-20
+                    h-20
+                    object-cover
+                    rounded-2xl
+                    border
+                    border-white/10
+                    shadow-lg
+                  "
+                  style={{
+                    marginLeft: index === 0 ? 0 : -18,
+                    zIndex: 10 - index,
+                  }}
+                />
+              ))}
+            </div>
+
+            <div className="mt-5 text-green-400">
+              View Collection →
+            </div>
+          </div>
+
+          <div
+            onClick={() => setSelectedCategory("Accessories")}
+            className="
+              bg-white/5
+              backdrop-blur-xl
+              rounded-3xl
+              p-5
+              min-h-[180px]
+              border
+              border-white/10
+              cursor-pointer
+              hover:border-orange-500
+              hover:bg-white/10
+              hover:-translate-y-1
+              transition-all
+              duration-300
+            "
+          >
+            <h2 className="text-2xl font-semibold">
+              Accessories
+            </h2>
+
+            <p className="text-gray-400 mt-2">
+              {accessories.length} Items
+            </p>
+
+            <div className="flex flex-row items-center mt-6">
+              {accessories.slice(0, 3).map((item, index) => (
+                <img
+                  key={item.id}
+                  src={item.image_url}
+                  alt=""
+                  className="
+                    w-20
+                    h-20
+                    object-cover
+                    rounded-2xl
+                    border
+                    border-white/10
+                    shadow-lg
+                  "
+                  style={{
+                    marginLeft: index === 0 ? 0 : -18,
+                    zIndex: 10 - index,
+                  }}
+                />
+              ))}
+            </div>
+              {accessories.slice(0, 3).map((item, index) => (
+                <img
+                  key={item.id}
+                  src={item.image_url}
+                  alt=""
+                  className="
+                    w-20
+                    h-20
+                    object-cover
+                    rounded-2xl
+                    border
+                    border-white/10
+                    shadow-lg
+                  "
+                  style={{
+                    marginLeft: index === 0 ? 0 : -18,
+                    zIndex: 10 - index,
+                  }}
+                />
+              ))}
+            
+
+            <div className="mt-5 text-orange-400">
+              View Collection →
+            </div>
+          </div>
+
+        </div>
+      )}
+      {selectedCategory !== "" && (
+        <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6 mt-10">
+        {clothes
+          .filter(
+            (item) =>
+              item.category === selectedCategory
+          )
+          .map((item) => (
           <div
             key={item.id}
             className="bg-[#13131A] p-4 rounded-3xl border border-transparent hover:border-purple-500 hover:scale-[1.02] transition-all duration-300"
@@ -156,7 +458,87 @@ export default function WardrobePage() {
             </button>
           </div>
         ))}
-      </div>
+          </div>
+      
+      )}
+      
+      {showModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-[#13131A]/90 backdrop-blur-xl border border-white/10 rounded-3xl p-8 w-full max-w-md">
+
+            <h2 className="text-3xl font-bold mb-6">
+              Add Clothing
+            </h2>
+
+            <img
+              src={pendingImageUrl}
+              alt="Preview"
+              className="w-full h-64 object-cover rounded-2xl mb-6"
+            />
+
+            <input
+              value={clothingName}
+              onChange={(e) =>
+                setClothingName(e.target.value)
+              }
+              placeholder="Clothing Name"
+              className="w-full bg-[#1C1C24] p-4 rounded-xl mb-4"
+            />
+
+            <select
+              value={category}
+              onChange={(e) =>
+                setCategory(e.target.value)
+              }
+              className="w-full bg-[#1C1C24] p-4 rounded-xl mb-6"
+            >
+              <option>Top Wear</option>
+              <option>Bottom Wear</option>
+              <option>Footwear</option>
+              <option>Accessories</option>
+            </select>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowModal(false)}
+                className="flex-1 bg-gray-700 py-3 rounded-xl"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={async () => {
+                  const { error } = await supabase
+                    .from("clothes")
+                    .insert({
+                      user_id: userId,
+                      name: clothingName,
+                      image_url: pendingImageUrl,
+                      category: category,
+                    });
+
+                  if (error) {
+                    alert(error.message);
+                    return;
+                  }
+
+                  setShowModal(false);
+
+                  setClothingName("");
+
+                  setCategory("Top Wear");
+
+                  loadClothes(userId);
+                }}
+                className="flex-1 bg-purple-600 py-3 rounded-xl"
+              >
+                Save
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
     </main>
   );
 }
